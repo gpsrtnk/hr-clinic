@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HR Clinic — แบบสอบถามก่อนเข้าร่วม</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --deep:#1a1a2e; --card:#0f2040; --accent:#e94560; --gold:#f5a623;
+  --soft:#a8c0d6; --white:#f0f4f8; --muted:#7a8fa6; --ok:#2ecc71; --r:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Sarabun',sans-serif;background:var(--deep);color:var(--white);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 15% 20%,rgba(233,69,96,.1) 0%,transparent 55%),radial-gradient(ellipse at 85% 75%,rgba(15,52,96,.35) 0%,transparent 55%);pointer-events:none;z-index:0}
+
+.hdr{position:relative;z-index:10;text-align:center;padding:56px 20px 36px;animation:fadeD .7s ease both}
+.badge{display:inline-block;background:rgba(233,69,96,.15);border:1px solid rgba(233,69,96,.35);color:var(--accent);font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;padding:5px 18px;border-radius:50px;margin-bottom:20px}
+.hdr h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,2.9rem);font-weight:700;line-height:1.2;margin-bottom:14px;background:linear-gradient(135deg,#f0f4f8,#a8c0d6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hdr h1 em{background:linear-gradient(135deg,var(--accent),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-style:normal}
+.hdr p{color:var(--muted);font-size:14px;font-weight:300;max-width:480px;margin:0 auto;line-height:1.7}
+
+.prog-wrap{position:sticky;top:0;z-index:200;background:rgba(26,26,46,.96);backdrop-filter:blur(18px);border-bottom:1px solid rgba(168,192,214,.1);padding:13px 20px}
+.prog-row{display:flex;justify-content:space-between;align-items:center;max-width:700px;margin:0 auto 8px}
+.prog-label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.prog-count{font-size:13px;font-weight:700;color:var(--accent)}
+.prog-bar{max-width:700px;margin:0 auto;height:3px;background:rgba(168,192,214,.15);border-radius:10px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--gold));border-radius:10px;transition:width .5s ease;width:0%}
+
+.wrap{position:relative;z-index:10;max-width:700px;margin:0 auto;padding:20px 20px 90px}
+
+/* ── CONFIG BOX ── */
+.config-box{background:rgba(88,166,255,.07);border:1px solid rgba(88,166,255,.25);border-radius:14px;padding:20px 24px;margin:28px 0 6px}
+.config-box h4{font-size:13px;font-weight:700;color:#58a6ff;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.config-box p{font-size:12px;color:rgba(168,192,214,.8);line-height:1.7;font-weight:300;margin-bottom:12px}
+.url-input{width:100%;background:rgba(0,0,0,.3);border:1px solid rgba(88,166,255,.3);border-radius:8px;padding:10px 14px;color:#58a6ff;font-family:monospace;font-size:13px;outline:none;transition:border-color .2s}
+.url-input:focus{border-color:rgba(88,166,255,.6)}
+.url-input::placeholder{color:rgba(88,166,255,.35)}
+.test-btn{margin-top:10px;background:rgba(88,166,255,.12);border:1px solid rgba(88,166,255,.3);color:#58a6ff;padding:8px 18px;border-radius:7px;font-family:'Sarabun',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
+.test-btn:hover{background:rgba(88,166,255,.22)}
+.conn-status{display:inline-flex;align-items:center;gap:6px;font-size:12px;margin-left:10px;font-weight:600}
+.conn-status.ok{color:var(--ok)}
+.conn-status.err{color:var(--accent)}
+.conn-status.checking{color:var(--gold)}
+
+.notice{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.22);border-radius:12px;padding:18px 22px;margin:14px 0 6px;display:flex;gap:14px;align-items:flex-start}
+.notice h4{font-size:13px;font-weight:700;color:var(--gold);margin-bottom:5px}
+.notice p{font-size:12px;color:rgba(168,192,214,.85);line-height:1.7;font-weight:300}
+
+.sec-hdr{display:flex;align-items:center;gap:14px;margin:44px 0 18px}
+.sec-num{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+.sA{background:rgba(233,69,96,.18);color:var(--accent);border:1px solid rgba(233,69,96,.3)}
+.sB{background:rgba(15,52,96,.55);color:var(--soft);border:1px solid rgba(168,192,214,.2)}
+.sC{background:rgba(245,166,35,.14);color:var(--gold);border:1px solid rgba(245,166,35,.3)}
+.sD{background:rgba(233,69,96,.18);color:var(--accent);border:1px solid rgba(233,69,96,.3)}
+.sE{background:rgba(46,204,113,.14);color:var(--ok);border:1px solid rgba(46,204,113,.3)}
+.sec-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:600}
+.sec-sub{font-size:12px;color:var(--muted);margin-top:2px}
+
+.qc{background:rgba(15,52,96,.22);border:1px solid rgba(168,192,214,.1);border-radius:var(--r);padding:24px;margin-bottom:14px;transition:border-color .25s,background .25s}
+.qc:hover{border-color:rgba(233,69,96,.18);background:rgba(15,52,96,.32)}
+.qc.ok{border-color:rgba(46,204,113,.28);background:rgba(46,204,113,.05)}
+.ql{font-size:14px;font-weight:500;line-height:1.6;margin-bottom:16px;display:flex;gap:10px}
+.qnum{color:var(--accent);font-weight:700;font-size:13px;flex-shrink:0;margin-top:1px}
+.req{color:var(--accent);font-size:11px}
+
+.opt-list{display:grid;gap:9px}
+.opt-list.two{grid-template-columns:1fr 1fr}
+@media(max-width:520px){.opt-list.two{grid-template-columns:1fr}}
+.opt-item{display:block}
+.opt-item input[type=radio],.opt-item input[type=checkbox]{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.opt-face{display:flex;align-items:center;gap:12px;padding:11px 15px;background:rgba(255,255,255,.04);border:1px solid rgba(168,192,214,.12);border-radius:10px;cursor:pointer;font-size:13px;color:var(--soft);line-height:1.5;transition:background .18s,border-color .18s,color .18s;user-select:none}
+.opt-item input:checked~.opt-face,.opt-item:has(input:checked) .opt-face{background:rgba(233,69,96,.13);border-color:var(--accent);color:var(--white)}
+.opt-face:hover{background:rgba(233,69,96,.08);border-color:rgba(233,69,96,.28);color:var(--white)}
+.dot{width:17px;height:17px;border:2px solid rgba(168,192,214,.3);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .18s}
+.opt-item input:checked~.opt-face .dot,.opt-item:has(input:checked) .opt-face .dot{border-color:var(--accent);background:var(--accent)}
+.dot::after{content:'';width:5px;height:5px;background:white;border-radius:50%;opacity:0;transition:opacity .18s}
+.opt-item input:checked~.opt-face .dot::after,.opt-item:has(input:checked) .opt-face .dot::after{opacity:1}
+.sq{width:17px;height:17px;border:2px solid rgba(168,192,214,.3);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .18s}
+.opt-item input:checked~.opt-face .sq,.opt-item:has(input:checked) .opt-face .sq{border-color:var(--accent);background:var(--accent)}
+.sq::after{content:'✓';font-size:10px;color:white;opacity:0;transition:opacity .18s}
+.opt-item input:checked~.opt-face .sq::after,.opt-item:has(input:checked) .opt-face .sq::after{opacity:1}
+
+.scale-wrap{display:flex;flex-direction:column;gap:10px}
+.scale-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+.scale-row{display:flex;gap:6px}
+.sbtn{flex:1;padding:10px 2px;background:rgba(255,255,255,.04);border:1px solid rgba(168,192,214,.12);border-radius:8px;cursor:pointer;font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;color:var(--muted);transition:all .18s;text-align:center}
+.sbtn:hover{background:rgba(233,69,96,.1);border-color:rgba(233,69,96,.3);color:var(--white)}
+.sbtn.on{background:var(--accent);border-color:var(--accent);color:white;transform:scale(1.06)}
+
+.ftxt{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(168,192,214,.14);border-radius:10px;padding:12px 14px;color:var(--white);font-family:'Sarabun',sans-serif;font-size:13px;font-weight:300;line-height:1.7;resize:vertical;min-height:88px;outline:none;transition:border-color .2s,background .2s}
+.finp{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(168,192,214,.14);border-radius:10px;padding:11px 14px;color:var(--white);font-family:'Sarabun',sans-serif;font-size:13px;font-weight:400;outline:none;transition:border-color .2s,background .2s}
+.ftxt:focus,.finp:focus{border-color:rgba(233,69,96,.45);background:rgba(233,69,96,.05)}
+.ftxt::placeholder,.finp::placeholder{color:rgba(122,143,166,.55)}
+.cc{text-align:right;font-size:11px;color:var(--muted);margin-top:5px}
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:500px){.ig{grid-template-columns:1fr}}
+.ifl label{display:block;font-size:11px;font-weight:600;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+
+.sub-sec{margin-top:44px;text-align:center}
+.sub-btn{display:inline-flex;align-items:center;gap:12px;background:linear-gradient(135deg,var(--accent),#c0392b);color:white;border:none;padding:16px 44px;border-radius:50px;font-family:'Sarabun',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .3s;box-shadow:0 8px 28px rgba(233,69,96,.32)}
+.sub-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 12px 36px rgba(233,69,96,.44)}
+.sub-btn:disabled{opacity:.5;cursor:not-allowed}
+.sub-note{margin-top:13px;font-size:12px;color:var(--muted)}
+
+/* Sending overlay */
+.sending-overlay{display:none;position:fixed;inset:0;background:rgba(26,26,46,.92);z-index:9998;flex-direction:column;align-items:center;justify-content:center;gap:20px;backdrop-filter:blur(8px)}
+.sending-overlay.show{display:flex}
+.spinner{width:56px;height:56px;border:4px solid rgba(233,69,96,.2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sending-text{font-size:15px;color:var(--soft);font-weight:400}
+
+.success{display:none;position:fixed;inset:0;background:var(--deep);z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center}
+.success.show{display:flex}
+.si{width:90px;height:90px;border-radius:50%;background:rgba(46,204,113,.14);border:2px solid rgba(46,204,113,.4);display:flex;align-items:center;justify-content:center;font-size:44px;margin-bottom:26px;animation:pop .5s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes pop{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
+.success h2{font-family:'Playfair Display',serif;font-size:1.8rem;margin-bottom:12px}
+.success p{color:var(--muted);font-size:14px;line-height:1.7;max-width:380px;font-weight:300}
+.refcode{margin-top:18px;background:rgba(255,255,255,.05);border:1px solid rgba(168,192,214,.15);border-radius:10px;padding:11px 22px;font-family:monospace;font-size:14px;color:var(--gold);letter-spacing:2px}
+.sheet-link{margin-top:14px;display:inline-flex;align-items:center;gap:8px;background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.25);color:var(--ok);padding:9px 20px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;transition:background .2s}
+.sheet-link:hover{background:rgba(46,204,113,.2)}
+
+.bot{position:fixed;bottom:0;left:0;right:0;background:rgba(26,26,46,.96);backdrop-filter:blur(18px);border-top:1px solid rgba(168,192,214,.08);padding:10px 20px;display:flex;justify-content:center;gap:20px;z-index:100;font-size:12px;color:var(--muted)}
+.bot .ok-n{color:var(--ok);font-weight:700}
+.bot .req-n{color:var(--accent);font-weight:700}
+
+@keyframes fadeD{0%{opacity:0;transform:translateY(-16px)}100%{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="badge">🏥 HR CLINIC PROGRAM</div>
+  <h1>แบบสอบถาม<br><em>ก่อนเข้าร่วมโครงการ</em></h1>
+  <p>กรุณาตอบคำถามด้วยความจริงใจ ข้อมูลของท่านจะถูกเก็บเป็นความลับและบันทึกลง Google Sheets โดยอัตโนมัติ</p>
+</div>
+
+<div class="prog-wrap">
+  <div class="prog-row">
+    <span class="prog-label">ความคืบหน้า</span>
+    <span class="prog-count" id="pCount">0 / 18 ข้อ</span>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="pFill"></div></div>
+</div>
+
+<div class="wrap">
+
+  <!-- CONFIG -->
+  <div style="background:rgba(46,204,113,.08);border:1px solid rgba(46,204,113,.25);border-radius:12px;padding:14px 20px;margin:28px 0 6px;display:flex;align-items:center;gap:12px;font-size:13px;color:#2ecc71;font-weight:500">
+    <span style="font-size:18px">✅</span>
+    <span>เชื่อมต่อ Google Sheets แล้ว — ข้อมูลจะบันทึกอัตโนมัติเมื่อกดส่ง</span>
+  </div>
+
+  <div class="notice">
+    <span style="font-size:20px;flex-shrink:0">🔒</span>
+    <div>
+      <h4>การรักษาความลับ</h4>
+      <p>ข้อมูลทั้งหมดในแบบสอบถามนี้จะถูกเก็บเป็นความลับอย่างเคร่งครัด รับรู้เฉพาะ HR ที่ดูแลเท่านั้น และไม่มีการรายงานต่อหัวหน้างานหรือผู้บริหารโดยตรง</p>
+    </div>
+  </div>
+
+  <form id="hrForm" onsubmit="return false">
+
+    <!-- A -->
+    <div class="sec-hdr">
+      <div class="sec-num sA">A</div>
+      <div><div class="sec-title">ข้อมูลเบื้องต้น</div><div class="sec-sub">General Information</div></div>
+    </div>
+    <div class="qc" id="c1">
+      <div class="ql"><span class="qnum">01.</span><span>ชื่อ-นามสกุล (ไม่บังคับ)</span></div>
+      <div class="ig">
+        <div class="ifl"><label>ชื่อ</label><input class="finp" id="q1a" type="text" placeholder="ชื่อจริง" oninput="upd()"></div>
+        <div class="ifl"><label>นามสกุล</label><input class="finp" id="q1b" type="text" placeholder="นามสกุล" oninput="upd()"></div>
+      </div>
+    </div>
+    <div class="qc" id="c2">
+      <div class="ql"><span class="qnum">02.</span><span>แผนก / ฝ่ายที่สังกัด <span class="req">*</span></span></div>
+      <div class="opt-list two">
+        <label class="opt-item"><input type="radio" name="q2" value="ฝ่ายผลิต" onchange="upd();mark('c2')"><span class="opt-face"><span class="dot"></span>ฝ่ายผลิต</span></label>
+        <label class="opt-item"><input type="radio" name="q2" value="ฝ่ายบัญชี/การเงิน" onchange="upd();mark('c2')"><span class="opt-face"><span class="dot"></span>ฝ่ายบัญชี/การเงิน</span></label>
+        <label class="opt-item"><input type="radio" name="q2" value="ฝ่ายขาย/การตลาด" onchange="upd();mark('c2')"><span class="opt-face"><span class="dot"></span>ฝ่ายขาย/การตลาด</span></label>
+        <label class="opt-item"><input type="radio" name="q2" value="ฝ่าย HR/บุคคล" onchange="upd();mark('c2')"><span class="opt-face"><span class="dot"></span>ฝ่าย HR/บุคคล</span></label>
+        <label class="opt-item"><input type="radio" name="q2" value="ฝ่ายปฏิบัติการ" onchange="upd();mark('c2')"><span class="opt-face"><span class="dot"></span>ฝ่ายปฏิบัติการ</span></label>
+        <label class="opt-item"><input type="radio" name="q2" value="อื่น ๆ" onchange="upd();mark('c2')"><span class="opt-face"><span class="dot"></span>อื่น ๆ</span></label>
+      </div>
+    </div>
+    <div class="qc" id="c3">
+      <div class="ql"><span class="qnum">03.</span><span>ระยะเวลาที่ทำงานในองค์กร <span class="req">*</span></span></div>
+      <div class="opt-list two">
+        <label class="opt-item"><input type="radio" name="q3" value="น้อยกว่า 1 ปี" onchange="upd();mark('c3')"><span class="opt-face"><span class="dot"></span>น้อยกว่า 1 ปี</span></label>
+        <label class="opt-item"><input type="radio" name="q3" value="1-3 ปี" onchange="upd();mark('c3')"><span class="opt-face"><span class="dot"></span>1–3 ปี</span></label>
+        <label class="opt-item"><input type="radio" name="q3" value="3-5 ปี" onchange="upd();mark('c3')"><span class="opt-face"><span class="dot"></span>3–5 ปี</span></label>
+        <label class="opt-item"><input type="radio" name="q3" value="มากกว่า 5 ปี" onchange="upd();mark('c3')"><span class="opt-face"><span class="dot"></span>มากกว่า 5 ปี</span></label>
+      </div>
+    </div>
+
+    <!-- B -->
+    <div class="sec-hdr">
+      <div class="sec-num sB">B</div>
+      <div><div class="sec-title">ความพึงพอใจในงานปัจจุบัน</div><div class="sec-sub">Current Job Satisfaction</div></div>
+    </div>
+    <div class="qc" id="c4">
+      <div class="ql"><span class="qnum">04.</span><span>ระดับความพึงพอใจในงานโดยรวม (1–10) <span class="req">*</span></span></div>
+      <div class="scale-wrap">
+        <div class="scale-labels"><span>😞 ไม่พึงพอใจ</span><span>😊 พึงพอใจมาก</span></div>
+        <div class="scale-row" id="sc4">
+          <button type="button" class="sbtn" onclick="pickScale('sc4','q4',this)">1</button><button type="button" class="sbtn" onclick="pickScale('sc4','q4',this)">2</button><button type="button" class="sbtn" onclick="pickScale('sc4','q4',this)">3</button><button type="button" class="sbtn" onclick="pickScale('sc4','q4',this)">4</button><button type="button" class="sbtn" onclick="pickScale('sc4','q4',this)">5</button><button type="button" class="sbtn" onclick="pickScale('sc4','q4',this)">6</button><button type="button" class="sbtn" onclick="pickScale('sc4','q4',this)">7</button><button type="button" class="sbtn" onclick="pickScale('sc4','q4',this)">8</button><button type="button" class="sbtn" onclick="pickScale('sc4','q4',this)">9</button><button type="button" class="sbtn" onclick="pickScale('sc4','q4',this)">10</button>
+        </div>
+      </div>
+    </div>
+    <div class="qc" id="c5">
+      <div class="ql"><span class="qnum">05.</span><span>สิ่งที่พึงพอใจมากที่สุดในงาน (เลือกได้หลายข้อ) <span class="req">*</span></span></div>
+      <div class="opt-list">
+        <label class="opt-item"><input type="checkbox" name="q5" value="เพื่อนร่วมงาน" onchange="upd();mark('c5')"><span class="opt-face"><span class="sq"></span>เพื่อนร่วมงานและบรรยากาศในทีม</span></label>
+        <label class="opt-item"><input type="checkbox" name="q5" value="ค่าตอบแทน" onchange="upd();mark('c5')"><span class="opt-face"><span class="sq"></span>ค่าตอบแทนและสวัสดิการ</span></label>
+        <label class="opt-item"><input type="checkbox" name="q5" value="ความท้าทาย" onchange="upd();mark('c5')"><span class="opt-face"><span class="sq"></span>ความท้าทายและการเรียนรู้</span></label>
+        <label class="opt-item"><input type="checkbox" name="q5" value="ความมั่นคง" onchange="upd();mark('c5')"><span class="opt-face"><span class="sq"></span>ความมั่นคงของงาน</span></label>
+        <label class="opt-item"><input type="checkbox" name="q5" value="ความยืดหยุ่น" onchange="upd();mark('c5')"><span class="opt-face"><span class="sq"></span>ความยืดหยุ่นในการทำงาน</span></label>
+        <label class="opt-item"><input type="checkbox" name="q5" value="ความก้าวหน้า" onchange="upd();mark('c5')"><span class="opt-face"><span class="sq"></span>โอกาสความก้าวหน้าในสายงาน</span></label>
+      </div>
+    </div>
+    <div class="qc" id="c6">
+      <div class="ql"><span class="qnum">06.</span><span>ปัจจุบันรู้สึกอย่างไรกับงานที่ทำ <span class="req">*</span></span></div>
+      <div class="opt-list">
+        <label class="opt-item"><input type="radio" name="q6" value="มีแรงบันดาลใจ" onchange="upd();mark('c6')"><span class="opt-face"><span class="dot"></span>🔥 มีแรงบันดาลใจและกระตือรือร้น</span></label>
+        <label class="opt-item"><input type="radio" name="q6" value="พอใจ" onchange="upd();mark('c6')"><span class="opt-face"><span class="dot"></span>😊 พอใจและทำงานได้ตามปกติ</span></label>
+        <label class="opt-item"><input type="radio" name="q6" value="เหนื่อยแต่ไปได้" onchange="upd();mark('c6')"><span class="opt-face"><span class="dot"></span>😐 เหนื่อยแต่ยังพอรับได้</span></label>
+        <label class="opt-item"><input type="radio" name="q6" value="เครียด" onchange="upd();mark('c6')"><span class="opt-face"><span class="dot"></span>😟 รู้สึกเครียดและกดดัน</span></label>
+        <label class="opt-item"><input type="radio" name="q6" value="หมดไฟ" onchange="upd();mark('c6')"><span class="opt-face"><span class="dot"></span>😔 รู้สึกหมดไฟ (Burnout)</span></label>
+      </div>
+    </div>
+
+    <!-- C -->
+    <div class="sec-hdr">
+      <div class="sec-num sC">C</div>
+      <div><div class="sec-title">ประเด็นที่อยากพูดคุยกับ HR</div><div class="sec-sub">Topics to Discuss</div></div>
+    </div>
+    <div class="qc" id="c7">
+      <div class="ql"><span class="qnum">07.</span><span>หัวข้อที่ต้องการพูดคุย (เลือกได้หลายข้อ) <span class="req">*</span></span></div>
+      <div class="opt-list">
+        <label class="opt-item"><input type="checkbox" name="q7" value="ความก้าวหน้าสายงาน" onchange="upd();mark('c7')"><span class="opt-face"><span class="sq"></span>📈 เส้นทางความก้าวหน้าในสายงาน</span></label>
+        <label class="opt-item"><input type="checkbox" name="q7" value="ค่าตอบแทน" onchange="upd();mark('c7')"><span class="opt-face"><span class="sq"></span>💰 ค่าตอบแทนและสวัสดิการ</span></label>
+        <label class="opt-item"><input type="checkbox" name="q7" value="ความสัมพันธ์กับหัวหน้า" onchange="upd();mark('c7')"><span class="opt-face"><span class="sq"></span>👤 ความสัมพันธ์กับหัวหน้างาน</span></label>
+        <label class="opt-item"><input type="checkbox" name="q7" value="ความสัมพันธ์เพื่อนร่วมงาน" onchange="upd();mark('c7')"><span class="opt-face"><span class="sq"></span>👥 ความสัมพันธ์กับเพื่อนร่วมงาน</span></label>
+        <label class="opt-item"><input type="checkbox" name="q7" value="Work-Life Balance" onchange="upd();mark('c7')"><span class="opt-face"><span class="sq"></span>⚖️ ภาระงานและ Work-Life Balance</span></label>
+        <label class="opt-item"><input type="checkbox" name="q7" value="การพัฒนาทักษะ" onchange="upd();mark('c7')"><span class="opt-face"><span class="sq"></span>🎓 การพัฒนาทักษะและฝึกอบรม</span></label>
+        <label class="opt-item"><input type="checkbox" name="q7" value="นโยบายองค์กร" onchange="upd();mark('c7')"><span class="opt-face"><span class="sq"></span>📋 นโยบายองค์กร</span></label>
+        <label class="opt-item"><input type="checkbox" name="q7" value="สุขภาพและความเครียด" onchange="upd();mark('c7')"><span class="opt-face"><span class="sq"></span>💚 สุขภาพและความเครียด</span></label>
+      </div>
+    </div>
+    <div class="qc" id="c8">
+      <div class="ql"><span class="qnum">08.</span><span>เรื่องที่อยากพูดถึงเป็นพิเศษ (ถ้ามี)</span></div>
+      <textarea class="ftxt" id="q8" maxlength="500" oninput="ccount(this,'cc8');upd()" placeholder="เขียนได้อย่างอิสระ..."></textarea>
+      <div class="cc" id="cc8">0 / 500</div>
+    </div>
+    <div class="qc" id="c9">
+      <div class="ql"><span class="qnum">09.</span><span>ระดับความเร่งด่วนของเรื่องที่ต้องการพูดคุย <span class="req">*</span></span></div>
+      <div class="opt-list">
+        <label class="opt-item"><input type="radio" name="q9" value="เร่งด่วนมาก" onchange="upd();mark('c9')"><span class="opt-face"><span class="dot"></span>🔴 เร่งด่วนมาก — ต้องการความช่วยเหลือโดยเร็ว</span></label>
+        <label class="opt-item"><input type="radio" name="q9" value="ค่อนข้างเร่งด่วน" onchange="upd();mark('c9')"><span class="opt-face"><span class="dot"></span>🟡 ค่อนข้างเร่งด่วน — ภายใน 1-2 สัปดาห์</span></label>
+        <label class="opt-item"><input type="radio" name="q9" value="ไม่เร่งด่วน" onchange="upd();mark('c9')"><span class="opt-face"><span class="dot"></span>🟢 ไม่เร่งด่วน — สะดวกเมื่อไหร่ก็ได้</span></label>
+        <label class="opt-item"><input type="radio" name="q9" value="ต้องการระบาย" onchange="upd();mark('c9')"><span class="opt-face"><span class="dot"></span>💙 เพียงต้องการพื้นที่ระบายและรับฟัง</span></label>
+      </div>
+    </div>
+
+    <!-- D -->
+    <div class="sec-hdr">
+      <div class="sec-num sD">D</div>
+      <div><div class="sec-title">ความคาดหวังก่อนเข้าร่วม</div><div class="sec-sub">Expectations</div></div>
+    </div>
+    <div class="qc" id="c10">
+      <div class="ql"><span class="qnum">10.</span><span>คาดหวังอะไรจาก HR Clinic มากที่สุด <span class="req">*</span></span></div>
+      <div class="opt-list">
+        <label class="opt-item"><input type="radio" name="q10" value="ได้รับการรับฟัง" onchange="upd();mark('c10')"><span class="opt-face"><span class="dot"></span>👂 มีคนรับฟังโดยไม่ตัดสิน</span></label>
+        <label class="opt-item"><input type="radio" name="q10" value="คำแนะนำ" onchange="upd();mark('c10')"><span class="opt-face"><span class="dot"></span>💡 ได้รับคำแนะนำและแนวทาง</span></label>
+        <label class="opt-item"><input type="radio" name="q10" value="การเปลี่ยนแปลง" onchange="upd();mark('c10')"><span class="opt-face"><span class="dot"></span>🔄 เห็นการเปลี่ยนแปลงที่เป็นรูปธรรม</span></label>
+        <label class="opt-item"><input type="radio" name="q10" value="ความปลอดภัย" onchange="upd();mark('c10')"><span class="opt-face"><span class="dot"></span>🛡️ รู้สึกปลอดภัยและมีที่พึ่งในองค์กร</span></label>
+        <label class="opt-item"><input type="radio" name="q10" value="เข้าใจสิทธิ" onchange="upd();mark('c10')"><span class="opt-face"><span class="dot"></span>📖 เข้าใจนโยบายและสิทธิ์ของตัวเอง</span></label>
+      </div>
+    </div>
+    <div class="qc" id="c11">
+      <div class="ql"><span class="qnum">11.</span><span>ต้องการให้ HR ช่วยในรูปแบบใด <span class="req">*</span></span></div>
+      <div class="opt-list">
+        <label class="opt-item"><input type="radio" name="q11" value="รับฟัง" onchange="upd();mark('c11')"><span class="opt-face"><span class="dot"></span>รับฟังโดยไม่ต้องให้คำแนะนำ</span></label>
+        <label class="opt-item"><input type="radio" name="q11" value="ให้คำแนะนำ" onchange="upd();mark('c11')"><span class="opt-face"><span class="dot"></span>ให้คำแนะนำและแนวทางการจัดการ</span></label>
+        <label class="opt-item"><input type="radio" name="q11" value="ประสานงาน" onchange="upd();mark('c11')"><span class="opt-face"><span class="dot"></span>ช่วยประสานกับฝ่ายที่เกี่ยวข้อง</span></label>
+        <label class="opt-item"><input type="radio" name="q11" value="วางแผนอนาคต" onchange="upd();mark('c11')"><span class="opt-face"><span class="dot"></span>ร่วมวางแผนพัฒนาสายงานระยะยาว</span></label>
+      </div>
+    </div>
+    <div class="qc" id="c12">
+      <div class="ql"><span class="qnum">12.</span><span>คิดว่า HR Clinic จะมีประโยชน์แค่ไหน (1–10) <span class="req">*</span></span></div>
+      <div class="scale-wrap">
+        <div class="scale-labels"><span>😐 ไม่มีประโยชน์</span><span>🌟 ประโยชน์มาก</span></div>
+        <div class="scale-row" id="sc12">
+          <button type="button" class="sbtn" onclick="pickScale('sc12','q12',this)">1</button><button type="button" class="sbtn" onclick="pickScale('sc12','q12',this)">2</button><button type="button" class="sbtn" onclick="pickScale('sc12','q12',this)">3</button><button type="button" class="sbtn" onclick="pickScale('sc12','q12',this)">4</button><button type="button" class="sbtn" onclick="pickScale('sc12','q12',this)">5</button><button type="button" class="sbtn" onclick="pickScale('sc12','q12',this)">6</button><button type="button" class="sbtn" onclick="pickScale('sc12','q12',this)">7</button><button type="button" class="sbtn" onclick="pickScale('sc12','q12',this)">8</button><button type="button" class="sbtn" onclick="pickScale('sc12','q12',this)">9</button><button type="button" class="sbtn" onclick="pickScale('sc12','q12',this)">10</button>
+        </div>
+      </div>
+    </div>
+    <div class="qc" id="c13">
+      <div class="ql"><span class="qnum">13.</span><span>ความกังวลเกี่ยวกับการเข้าร่วม (เลือกได้หลายข้อ)</span></div>
+      <div class="opt-list">
+        <label class="opt-item"><input type="checkbox" name="q13" value="กังวลเรื่องความลับ" onchange="upd();mark('c13')"><span class="opt-face"><span class="sq"></span>กังวลว่าข้อมูลจะไม่ถูกเก็บเป็นความลับ</span></label>
+        <label class="opt-item"><input type="checkbox" name="q13" value="กังวลว่าหัวหน้าจะรู้" onchange="upd();mark('c13')"><span class="opt-face"><span class="sq"></span>กังวลว่าหัวหน้าหรือผู้บริหารจะรับรู้</span></label>
+        <label class="opt-item"><input type="checkbox" name="q13" value="ไม่แน่ใจว่าจะเปลี่ยนแปลงได้" onchange="upd();mark('c13')"><span class="opt-face"><span class="sq"></span>ไม่แน่ใจว่าจะเกิดการเปลี่ยนแปลงจริง</span></label>
+        <label class="opt-item"><input type="checkbox" name="q13" value="ไม่มีความกังวล" onchange="upd();mark('c13')"><span class="opt-face"><span class="sq"></span>ไม่มีความกังวลใด ๆ</span></label>
+      </div>
+    </div>
+
+    <!-- E -->
+    <div class="sec-hdr">
+      <div class="sec-num sE">E</div>
+      <div><div class="sec-title">ข้อเสนอแนะต่อองค์กร</div><div class="sec-sub">Organizational Suggestions</div></div>
+    </div>
+    <div class="qc" id="c14">
+      <div class="ql"><span class="qnum">14.</span><span>ด้านที่ควรปรับปรุงมากที่สุด (เลือกได้หลายข้อ) <span class="req">*</span></span></div>
+      <div class="opt-list">
+        <label class="opt-item"><input type="checkbox" name="q14" value="การสื่อสาร" onchange="upd();mark('c14')"><span class="opt-face"><span class="sq"></span>📢 การสื่อสารและความโปร่งใส</span></label>
+        <label class="opt-item"><input type="checkbox" name="q14" value="ค่าตอบแทน" onchange="upd();mark('c14')"><span class="opt-face"><span class="sq"></span>💰 ระบบค่าตอบแทนและสวัสดิการ</span></label>
+        <label class="opt-item"><input type="checkbox" name="q14" value="การพัฒนาคน" onchange="upd();mark('c14')"><span class="opt-face"><span class="sq"></span>🎓 โอกาสการพัฒนาและฝึกอบรม</span></label>
+        <label class="opt-item"><input type="checkbox" name="q14" value="สภาพแวดล้อม" onchange="upd();mark('c14')"><span class="opt-face"><span class="sq"></span>🏢 สภาพแวดล้อมการทำงาน</span></label>
+        <label class="opt-item"><input type="checkbox" name="q14" value="ความสัมพันธ์หัวหน้าลูกน้อง" onchange="upd();mark('c14')"><span class="opt-face"><span class="sq"></span>🤝 ความสัมพันธ์หัวหน้า-พนักงาน</span></label>
+        <label class="opt-item"><input type="checkbox" name="q14" value="Work-Life Balance" onchange="upd();mark('c14')"><span class="opt-face"><span class="sq"></span>⚖️ นโยบาย Work-Life Balance</span></label>
+      </div>
+    </div>
+    <div class="qc" id="c15">
+      <div class="ql"><span class="qnum">15.</span><span>ถ้าเปลี่ยนแปลงได้ 1 อย่างในองค์กร คุณอยากเปลี่ยนอะไร?</span></div>
+      <textarea class="ftxt" id="q15" maxlength="400" oninput="ccount(this,'cc15');upd()" placeholder="แชร์ความคิดเห็นได้อย่างอิสระ..."></textarea>
+      <div class="cc" id="cc15">0 / 400</div>
+    </div>
+    <div class="qc" id="c16">
+      <div class="ql"><span class="qnum">16.</span><span>รู้สึกว่าเสียงพนักงานได้รับการรับฟังมากแค่ไหน (1–10) <span class="req">*</span></span></div>
+      <div class="scale-wrap">
+        <div class="scale-labels"><span>😞 ไม่ได้รับฟัง</span><span>😊 รับฟังดีมาก</span></div>
+        <div class="scale-row" id="sc16">
+          <button type="button" class="sbtn" onclick="pickScale('sc16','q16',this)">1</button><button type="button" class="sbtn" onclick="pickScale('sc16','q16',this)">2</button><button type="button" class="sbtn" onclick="pickScale('sc16','q16',this)">3</button><button type="button" class="sbtn" onclick="pickScale('sc16','q16',this)">4</button><button type="button" class="sbtn" onclick="pickScale('sc16','q16',this)">5</button><button type="button" class="sbtn" onclick="pickScale('sc16','q16',this)">6</button><button type="button" class="sbtn" onclick="pickScale('sc16','q16',this)">7</button><button type="button" class="sbtn" onclick="pickScale('sc16','q16',this)">8</button><button type="button" class="sbtn" onclick="pickScale('sc16','q16',this)">9</button><button type="button" class="sbtn" onclick="pickScale('sc16','q16',this)">10</button>
+        </div>
+      </div>
+    </div>
+    <div class="qc" id="c17">
+      <div class="ql"><span class="qnum">17.</span><span>ช่วงเวลาที่สะดวกเข้าร่วม HR Clinic <span class="req">*</span></span></div>
+      <div class="opt-list two">
+        <label class="opt-item"><input type="radio" name="q17" value="เช้า 09-12น" onchange="upd();mark('c17')"><span class="opt-face"><span class="dot"></span>🌅 เช้า (09:00–12:00)</span></label>
+        <label class="opt-item"><input type="radio" name="q17" value="บ่าย 13-16น" onchange="upd();mark('c17')"><span class="opt-face"><span class="dot"></span>☀️ บ่าย (13:00–16:00)</span></label>
+        <label class="opt-item"><input type="radio" name="q17" value="เย็น 16-18น" onchange="upd();mark('c17')"><span class="opt-face"><span class="dot"></span>🌆 เย็น (16:00–18:00)</span></label>
+        <label class="opt-item"><input type="radio" name="q17" value="ยืดหยุ่น" onchange="upd();mark('c17')"><span class="opt-face"><span class="dot"></span>🕐 ยืดหยุ่นได้</span></label>
+      </div>
+    </div>
+    <div class="qc" id="c18">
+      <div class="ql"><span class="qnum">18.</span><span>มีสิ่งอื่นที่อยากบอก HR ก่อนการสนทนา?</span></div>
+      <textarea class="ftxt" id="q18" maxlength="500" oninput="ccount(this,'cc18');upd()" placeholder="ฝากข้อความหรือสิ่งที่อยากให้ HR รู้ก่อนพบกัน..."></textarea>
+      <div class="cc" id="cc18">0 / 500</div>
+    </div>
+
+    <div class="sub-sec">
+      <button type="button" class="sub-btn" id="subBtn" onclick="doSubmit()">✉️ ส่งแบบสอบถาม</button>
+      <p class="sub-note">กรุณาตอบคำถามที่มีเครื่องหมาย <span style="color:var(--accent)">*</span> ให้ครบ และตั้งค่า URL ก่อนส่ง</p>
+    </div>
+  </form>
+</div>
+
+<div class="bot">
+  <span>ตอบแล้ว <span class="ok-n" id="bAns">0</span> ข้อ</span>
+  <span style="color:rgba(168,192,214,.25)">|</span>
+  <span>บังคับ <span class="req-n" id="bReq">0</span> / 12 ข้อ</span>
+</div>
+
+<!-- Sending -->
+<div class="sending-overlay" id="sendingOverlay">
+  <div class="spinner"></div>
+  <div class="sending-text">กำลังบันทึกลง Google Sheets...</div>
+</div>
+
+<!-- Success -->
+<div class="success" id="successBox">
+  <div class="si">✓</div>
+  <h2>ส่งสำเร็จแล้วครับ!</h2>
+  <p>ข้อมูลของท่านถูกบันทึกลง Google Sheets เรียบร้อยแล้ว<br>HR จะติดต่อเพื่อนัดหมายการสนทนาโดยเร็วที่สุด</p>
+  <div class="refcode" id="refEl">REF: HR-XXXXXX</div>
+  <p style="margin-top:18px;font-size:12px;color:rgba(122,143,166,.65)">ข้อมูลทั้งหมดถูกเก็บเป็นความลับตามนโยบาย HR Clinic</p>
+</div>
+
+<script>
+// ── URL ฝังตายตัว ──
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw3Pj4BYTjzN2sCsh8bKLaveiOU14C-NmFbTGx07bS8xyRi6QtFWjCVSw4zAc5hfm2NqA/exec';
+const scaleVals = {};
+
+function mark(id) { document.getElementById(id).classList.add('ok'); }
+
+function pickScale(rowId, qid, btn) {
+  document.getElementById(rowId).querySelectorAll('.sbtn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  scaleVals[qid] = parseInt(btn.textContent);
+  mark('c' + qid.replace('q',''));
+  upd();
+}
+
+function ccount(el, id) {
+  document.getElementById(id).textContent = el.value.length + ' / ' + el.getAttribute('maxlength');
+}
+
+function upd() {
+  let ans = 0, req = 0;
+  const rg = {};
+  document.querySelectorAll('input[type=radio]:checked').forEach(r => rg[r.name] = r.value);
+  ans += Object.keys(rg).length;
+  ['q2','q3','q6','q9','q10','q11','q17'].forEach(n => { if (rg[n]) req++; });
+  const cg = {};
+  document.querySelectorAll('input[type=checkbox]:checked').forEach(c => { if (!cg[c.name]) cg[c.name]=[]; cg[c.name].push(c.value); });
+  ans += Object.keys(cg).length;
+  ['q5','q7','q14'].forEach(n => { if (cg[n]) req++; });
+  ans += Object.keys(scaleVals).length;
+  ['q4','q12','q16'].forEach(k => { if (scaleVals[k]) req++; });
+  ['q1a','q1b','q8','q15','q18'].forEach(id => { const el = document.getElementById(id); if (el && el.value.trim()) ans++; });
+  document.getElementById('pFill').style.width = Math.min(ans/18*100,100) + '%';
+  document.getElementById('pCount').textContent = Math.min(ans,18) + ' / 18 ข้อ';
+  document.getElementById('bAns').textContent = Math.min(ans,18);
+  document.getElementById('bReq').textContent = req;
+}
+
+async function doSubmit() {
+  const scriptUrl = SCRIPT_URL;
+
+  const rg = {};
+  document.querySelectorAll('input[type=radio]:checked').forEach(r => rg[r.name] = r.value);
+  const cg = {};
+  document.querySelectorAll('input[type=checkbox]:checked').forEach(c => { if (!cg[c.name]) cg[c.name]=[]; cg[c.name].push(c.value); });
+
+  const missing = [];
+  ['q2','q3','q6','q9','q10','q11','q17'].forEach(n => { if (!rg[n]) missing.push(n); });
+  ['q5','q7','q14'].forEach(n => { if (!cg[n]) missing.push(n); });
+  ['q4','q12','q16'].forEach(k => { if (!scaleVals[k]) missing.push(k); });
+  if (missing.length) { alert('กรุณาตอบคำถามที่มีเครื่องหมาย * ให้ครบถ้วนก่อน\n(ยังขาดอีก ' + missing.length + ' ข้อ)'); return; }
+
+  const ref = 'HR-' + Date.now().toString().slice(-6);
+  const payload = {
+    ref, submittedAt: new Date().toISOString(),
+    name: ((document.getElementById('q1a').value||'') + ' ' + (document.getElementById('q1b').value||'')).trim() || 'ไม่ระบุ',
+    dept: rg['q2'], tenure: rg['q3'],
+    satisfaction: scaleVals['q4'], feeling: rg['q6'],
+    satisfiedWith: cg['q5']||[], topics: cg['q7']||[],
+    topicNote: document.getElementById('q8').value.trim(),
+    urgency: rg['q9'], expectation: rg['q10'], helpType: rg['q11'],
+    clinicValue: scaleVals['q12'], concerns: cg['q13']||[],
+    improve: cg['q14']||[], changeOne: document.getElementById('q15').value.trim(),
+    voiceHeard: scaleVals['q16'], timeSlot: rg['q17'],
+    finalNote: document.getElementById('q18').value.trim()
+  };
+
+  // แสดง loading
+  document.getElementById('subBtn').disabled = true;
+  document.getElementById('sendingOverlay').classList.add('show');
+
+  try {
+    const res = await fetch(scriptUrl, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+    document.getElementById('sendingOverlay').classList.remove('show');
+    if (result.status === 'success' || result.ref) {
+      document.getElementById('refEl').textContent = 'REF: ' + ref;
+      document.getElementById('successBox').classList.add('show');
+    } else {
+      throw new Error(result.message || 'Unknown error');
+    }
+  } catch (err) {
+    document.getElementById('sendingOverlay').classList.remove('show');
+    document.getElementById('subBtn').disabled = false;
+    alert('❌ เกิดข้อผิดพลาดในการส่งข้อมูล\n' + err.message + '\n\nกรุณาตรวจสอบ URL และลองใหม่อีกครั้ง');
+  }
+}
+</script>
+</body>
+</html>
